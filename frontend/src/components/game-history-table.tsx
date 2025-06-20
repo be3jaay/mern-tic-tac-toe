@@ -37,6 +37,7 @@ import {
 import { useDeleteAllGameHistory, useDeleteGameHistory, useFetchGameHistory } from "@/(features)"
 import { TableSkeleton } from "./table-skeleton-loading"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog"
+import { Badge } from "./ui/badge"
 
 export function GameHistoryTable() {
   const { deleteGameHistoryCb, isPending } = useDeleteGameHistory();
@@ -76,28 +77,25 @@ export function GameHistoryTable() {
         </Button>
       ),
       cell: ({ row }) => (
-        <div className="text-center">{new Date(row.getValue("date")).toLocaleDateString()}</div>
+        <div className="text-start">{new Date(row.getValue("date")).toLocaleDateString()}</div>
       ),
     },
     {
       accessorKey: "player1",
       header: "Player 1",
-      cell: ({ row }) => <div className="text-center">{row.getValue("player1")}</div>,
+      cell: ({ row }) => <div className="text-start">{row.getValue("player1")}</div>,
     },
     {
       accessorKey: "player2",
       header: "Player 2",
-      cell: ({ row }) => <div className="text-center">{row.getValue("player2")}</div>,
+      cell: ({ row }) => <div className="text-start">{row.getValue("player2")}</div>,
     },
     {
       accessorKey: "winner",
       header: "Winner",
-      cell: ({ row }) => <div className="text-center">{row.getValue("winner")}</div>,
-    },
-    {
-      accessorKey: "duration",
-      header: "Duration",
-      cell: ({ row }) => <div className="text-center">{row.getValue("duration")}</div>,
+      cell: ({ row }) => (
+        <Badge variant="outline" className="text-center bg-green-200">{row.getValue("winner")}</Badge>
+      ),
     },
     {
       accessorKey: "moves",
@@ -162,7 +160,7 @@ export function GameHistoryTable() {
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 gap-2">
         <Input
           placeholder="Filter by winner..."
           value={(table.getColumn("winner")?.getFilterValue() as string) ?? ""}
@@ -171,33 +169,7 @@ export function GameHistoryTable() {
           }
           className="max-w-sm"
         />
-        {table.getIsAllPageRowsSelected() && (
-          <div className="flex items-center justify-end">
-            <AlertDialog>
-              <AlertDialogTrigger className="text-sm bg-red-600 text-white py-2.5 px-6 rounded-md">
-                Delete All
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete all the anomaly logs from the database.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => {
-                    deleteAllGameHistoryCb();
-                  }}
-                    disabled={isPendingAll}
-                  >
-                    Delete All
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        )}
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -225,6 +197,33 @@ export function GameHistoryTable() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      {table.getIsAllPageRowsSelected() && (
+        <div className="flex items-center justify-end py-2">
+          <AlertDialog>
+            <AlertDialogTrigger className="text-sm cursor-pointer bg-red-600 text-white py-2.5 px-6 rounded-md">
+              Delete All
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete all the anomaly logs from the database.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => {
+                  deleteAllGameHistoryCb();
+                }}
+                  disabled={isPendingAll}
+                >
+                  Delete All
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      )}
       <div className="rounded-md border">
         <Table>
           <TableHeader>

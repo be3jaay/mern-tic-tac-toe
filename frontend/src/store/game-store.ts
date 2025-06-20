@@ -5,7 +5,6 @@ type TGameStoreValues = {
   date: Date;
   player1: string;
   player2: string;
-  duration: number;
   moves: number;
 };
 

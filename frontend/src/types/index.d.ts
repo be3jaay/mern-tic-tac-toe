@@ -15,6 +15,5 @@ type TGameHistoryParams = {
   winner: string;
   player1: string;
   player2: string;
-  duration: number;
   moves: number;
 };

@@ -5,10 +5,7 @@ export class GameHistoryService {
   public static async fetchGameHistory(): Promise<TGameHistoryResponse[]> {
     try {
       const response = await axios.get<TGameHistoryResponse[]>(
-        `${BASE_API_URL}/v1/game-history-list`,
-        {
-          withCredentials: true,
-        }
+        `${BASE_API_URL}/v1/game-history-list`
       );
       console.log("response", response.data);
       return response.data;
@@ -41,11 +38,9 @@ export class GameHistoryService {
     }
   }
 
-  public static async truncateGameHistory() {
+  public static async deleteAllGameHistory() {
     try {
-      const response = await axios.delete<TGameHistoryResponse>(
-        `${BASE_API_URL}/v1/game-history-list/truncate`
-      );
+      const response = await axios.delete(`${BASE_API_URL}/v1/game-delete-all`);
       return response.data;
     } catch (error) {
       console.log("error", error);

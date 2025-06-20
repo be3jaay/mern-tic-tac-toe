@@ -42,7 +42,7 @@ export const useDeleteAllGameHistory = (): {
 } => {
   const queryClient = useQueryClient();
   const { mutate, isPending, error } = useMutation({
-    mutationFn: async () => await GameHistoryService.truncateGameHistory(),
+    mutationFn: async () => await GameHistoryService.deleteAllGameHistory(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["game-history"] });
     },

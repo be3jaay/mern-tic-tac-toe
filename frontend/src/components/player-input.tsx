@@ -12,23 +12,24 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useGameStoreValues } from "@/hooks/use-game"
+import { useGameStoreValues } from "@/hooks/use-game-values"
 
 export function PlayerInput() {
   const [open, setOpen] = useState<boolean>(false)
   const { setGameStoreValues, player1, player2 } = useGameStoreValues();
   const [localPlayer1, setLocalPlayer1] = useState<string>(player1 || "")
   const [localPlayer2, setLocalPlayer2] = useState<string>(player2 || "")
+  const nameAlreadyExists = localPlayer1.toLowerCase() === localPlayer2.toLowerCase();
 
   const handleStartGame = () => {
     setGameStoreValues({
       player1: localPlayer1,
       player2: localPlayer2,
       winner: "",
-      duration: 0,
       moves: 0,
       date: new Date(),
     });
+
     setOpen(false);
     setLocalPlayer1("");
     setLocalPlayer2("");
@@ -73,7 +74,7 @@ export function PlayerInput() {
             onChange={e => setLocalPlayer2(e.target.value)}
           />
         </div>
-        {localPlayer1 === localPlayer2 && (
+        {nameAlreadyExists && (
           <span className="text-sm text-red-500">Player 1 and Player 2 cannot have the same name</span>
         )}
         <DialogFooter className="flex flex-row gap-2 justify-end mt-2">
@@ -82,7 +83,7 @@ export function PlayerInput() {
               Cancel
             </Button>
           </DialogClose>
-          <Button type="button" onClick={handleStartGame} disabled={!localPlayer1 || !localPlayer2 || localPlayer1 === localPlayer2}>
+          <Button type="button" onClick={handleStartGame} disabled={!localPlayer1 || !localPlayer2 || nameAlreadyExists}>
             Start Game
           </Button>
         </DialogFooter>

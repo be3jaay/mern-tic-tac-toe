@@ -22,9 +22,8 @@ export class GameHistoryService {
     const gameHistory = await GameHistoryList.findByIdAndDelete(id);
     return gameHistory;
   }
-
-  async truncateGameHistory() {
+  async deleteAllGameHistory() {
     await GameHistoryList.deleteMany({});
-    return { message: "Game history truncated" };
+    return [];
   }
 }

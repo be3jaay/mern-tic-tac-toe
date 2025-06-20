@@ -1,28 +1,25 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { Button } from "./ui/button"
-import { useGameStoreValues } from "@/hooks/use-game"
-import { useState } from "react"
 import { InitialPlay } from "./initial-play"
-import type { TGameStoreValues } from "@/store/game-store"
-import { useCreateGameHistory } from "@/(features)"
+import { useGameState } from "@/hooks/use-game-state"
 
 export const TicTacToe = () => {
-  const { createGameHistoryCb } = useCreateGameHistory()
-  const { player1, player2 } = useGameStoreValues();
-  const [countMoves, setCountMoves] = useState<number>(0);
-  const [gameBoard, setGameBoard] = useState<string[]>(Array(9).fill(null));
-  const playerTurns = countMoves % 2 === 0 ? player1 : player2;
-  const [isGameOver, setIsGameOver] = useState<boolean>(false);
-  const [winningMoves, setWinningMoves] = useState<number[][]>([
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ]);
+  const {
+    gameBoard,
+    player1,
+    player2,
+    playerTurns,
+    isGameOver,
+    winner,
+    winningLine,
+    currentSymbol,
+    handlePlayerTurn,
+    countPlayer1Wins,
+    countPlayer2Wins,
+    countDraw,
+    handleResetGame,
+    handleStopGameSession
+  } = useGameState();
 
   if (!player1 || !player2) {
     return (
@@ -30,69 +27,62 @@ export const TicTacToe = () => {
     )
   }
 
-  const handlePlayerTurn = (index: number) => {
-    const newGameBoard = [...gameBoard];
-    console.log("newGameBoard", newGameBoard);
-    newGameBoard[index] = "X";
-    setGameBoard(newGameBoard);
-    setCountMoves(countMoves + 1);
-  }
-
-  async function handleAddGameToHistory(values: TGameStoreValues) {
-    try {
-      await createGameHistoryCb({
-        date: new Date().toISOString(),
-        player1: values.player1,
-        player2: values.player2,
-        duration: 2,
-        moves: values.moves,
-        winner: values.winner,
-      })
-    } catch (error) {
-      console.log("error", error);
-    }
-  }
-
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle>Tic Tac Toe Game</CardTitle>
+    <Card className="rounded-3xl shadow-2xl border-0 bg-white/80 backdrop-blur-md">
+      <CardHeader className="text-center pb-2">
+        <CardTitle className="text-3xl font-poppins font-extrabold text-pink-600 drop-shadow">Tic Tac Toe Game</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-8">
         <div className="text-center space-y-2">
-          <p className="text-lg font-semibold">{playerTurns}'s turn ({countMoves % 2 === 0 ? "X" : "O"})</p>
+          {!isGameOver ? (
+            <p className="text-lg font-bold text-blue-600 animate-pulse">{playerTurns}'s turn <span className="text-2xl">({currentSymbol})</span></p>
+          ) : winner ? (
+            <p className="text-2xl font-extrabold text-green-600 animate-bounce">{winner === "🤖" ? player1 : player2} wins! 🎉</p>
+          ) : (
+            <p className="text-2xl font-extrabold text-yellow-600 animate-pulse">It's a draw! 🤝</p>
+          )}
         </div>
-
-        <div className="mx-auto max-w-xs">
-          <div className="grid grid-cols-3 gap-2 aspect-square">
-            {gameBoard.map((value, index) => (
-              <Button key={index} onClick={() => handlePlayerTurn(index)} variant="outline" className="aspect-square border border-pink-300 text-4xl font-bold h-20 w-20 p-0">
-                {value}
-              </Button>
-            ))}
+        <div className="mx-auto max-w-xs md:max-w-md">
+          <div className="grid grid-cols-3 aspect-square gap-2 bg-gradient-to-br from-pink-100 via-blue-50 to-yellow-50 rounded-2xl p-2 shadow-inner">
+            {gameBoard.map((value, index) => {
+              const isWinningCell = winningLine.includes(index);
+              return (
+                <Button
+                  key={index}
+                  onClick={() => handlePlayerTurn(index)}
+                  variant="outline"
+                  className={`aspect-square text-5xl font-extrabold h-24 w-24 md:h-28 md:w-28 p-0 rounded-xl transition-all duration-200 shadow-md border-2 border-pink-300 hover:bg-pink-200/70 active:scale-95 ${isWinningCell ? "bg-green-400/80 text-white animate-pulse shadow-lg scale-105" : ""}`}
+                  disabled={!!value || isGameOver}
+                >
+                  {value}
+                </Button>
+              )
+            })}
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 text-center">
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">Player {player1} Wins</p>
-            <p className="text-2xl font-bold">3</p>
+        <div className="grid grid-cols-2 gap-6 text-center mt-4">
+          <div className="space-y-1 bg-blue-100/60 rounded-xl py-2 shadow">
+            <p className="text-2xl">🤖</p>
+            <p className="text-sm text-blue-700 font-semibold">Player {player1} Wins</p>
+            <p className="text-3xl font-extrabold text-blue-700">{countPlayer1Wins}</p>
           </div>
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">Player {player2} Wins</p>
-            <p className="text-2xl font-bold">2</p>
+          <div className="space-y-1 bg-pink-100/60 rounded-xl py-2 shadow">
+            <p className="text-2xl">👽</p>
+            <p className="text-sm text-pink-700 font-semibold">Player {player2} Wins</p>
+            <p className="text-3xl font-extrabold text-pink-700">{countPlayer2Wins}</p>
           </div>
         </div>
-
-        <div className="text-center">
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">Draws</p>
-            <p className="text-2xl font-bold">2</p>
+        <div className="text-center mt-2">
+          <div className="space-y-1 bg-yellow-100/60 rounded-xl py-2 shadow inline-block px-6">
+            <p className="text-2xl">🤝</p>
+            <p className="text-sm text-yellow-700 font-semibold">Draws</p>
+            <p className="text-3xl font-extrabold text-yellow-700">{countDraw}</p>
           </div>
         </div>
         {isGameOver && (
-          <div className="flex flex-row gap-4 justify-center">
-            <Button >Play Another Game</Button>
-            <Button onClick={() => { }}>Reset Game</Button>
+          <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 px-4 mt-4">
+            <Button variant="destructive" className="rounded-xl shadow hover:scale-105 transition-all" onClick={handleStopGameSession}>Stop the Game Session</Button>
+            <Button className="rounded-xl bg-gradient-to-r from-pink-400 to-blue-400 text-white font-bold shadow hover:scale-105 transition-all" onClick={handleResetGame}>Play Again</Button>
           </div>
         )}
       </CardContent>

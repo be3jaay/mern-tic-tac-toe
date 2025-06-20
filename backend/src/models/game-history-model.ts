@@ -6,7 +6,6 @@ export interface IGameHistoryList extends Document {
   player1: string;
   player2: string;
   winner: string;
-  duration: number;
   moves: number;
 }
 
@@ -21,10 +20,6 @@ const gameHistoryListSchema = new Schema<IGameHistoryList>({
   },
   winner: {
     type: String,
-    required: true,
-  },
-  duration: {
-    type: Number,
     required: true,
   },
   moves: {

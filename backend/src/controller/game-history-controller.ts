@@ -6,11 +6,10 @@ import { StatusCodes } from "http-status-codes";
 export const createGameHistory = async (req: Request, res: Response) => {
   const gameHistoryService = new GameHistoryService();
   try {
-    const { date, winner, duration, moves, player1, player2 } = req.body;
+    const { date, winner, moves, player1, player2 } = req.body;
     const gameHistory = await gameHistoryService.createGameHistory({
       date,
       winner,
-      duration,
       moves,
       player1,
       player2,
@@ -54,11 +53,11 @@ export const deleteGameHistory = async (req: Request, res: Response) => {
   }
 };
 
-export const truncateGameHistory = async (req: Request, res: Response) => {
+export const deleteAllGameHistory = async (req: Request, res: Response) => {
   const gameHistoryService = new GameHistoryService();
 
   try {
-    const gameHistory = await gameHistoryService.truncateGameHistory();
+    const gameHistory = await gameHistoryService.deleteAllGameHistory();
     res.status(StatusCodes.OK).json(gameHistory);
   } catch (error) {
     res
