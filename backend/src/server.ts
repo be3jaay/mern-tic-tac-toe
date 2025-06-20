@@ -24,5 +24,5 @@ app.use("/api/v1/game-history-list", gameHistoryRoutes);
 app.use("/api/v1/game-delete-all", deleteAllGameHistory);
 
 connectDB().then(() => {
-  app.listen(PORT, () => console.log(`Server running on port`));
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 });
